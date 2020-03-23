@@ -184,7 +184,6 @@ class ChipInput extends React.Component {
     focusedChip: null,
     inputValue: '',
     isClean: true,
-    isFocused: false,
     chipsUpdated: false,
     prevPropsValue: []
   }
@@ -258,7 +257,6 @@ class ChipInput extends React.Component {
     if (this.props.onBlur) {
       this.props.onBlur(event)
     }
-    this.setState({ isFocused: false })
     if (this.state.focusedChip != null) {
       this.setState({ focusedChip: null })
     }
@@ -289,7 +287,6 @@ class ChipInput extends React.Component {
   }
 
   handleInputFocus = (event) => {
-    this.setState({ isFocused: true })
     if (this.props.onFocus) {
       this.props.onFocus(event)
     }
@@ -521,6 +518,7 @@ class ChipInput extends React.Component {
       rootRef,
       value,
       variant,
+      isFocused,
       ...other
     } = this.props
 
@@ -530,7 +528,7 @@ class ChipInput extends React.Component {
     const hasInput = (this.props.value || actualInputValue).length > 0 || actualInputValue.length > 0
     const shrinkFloatingLabel = InputLabelProps.shrink != null
       ? InputLabelProps.shrink
-      : (label != null && (hasInput || this.state.isFocused || chips.length > 0))
+      : (label != null && (hasInput || isFocused || chips.length > 0))
 
     const chipComponents = chips.map((chip, i) => {
       const value = dataSourceConfig ? chip[dataSourceConfig.value] : chip
@@ -587,7 +585,7 @@ class ChipInput extends React.Component {
             htmlFor={id}
             classes={{ root: cx(classes[variant], classes.label), shrink: classes.labelShrink }}
             shrink={shrinkFloatingLabel}
-            focused={this.state.isFocused}
+            focused={isFocused}
             variant={variant}
             ref={this.labelRef}
             {...InputLabelProps}
@@ -600,7 +598,7 @@ class ChipInput extends React.Component {
             classes[variant],
             classes.chipContainer,
             {
-              [classes.focused]: this.state.isFocused,
+              [classes.focused]: isFocused,
               [classes.underline]: !disableUnderline && variant === 'standard',
               [classes.disabled]: disabled,
               [classes.labeled]: label != null,
@@ -645,6 +643,7 @@ class ChipInput extends React.Component {
 }
 
 ChipInput.propTypes = {
+  isFocused: PropTypes.bool,
   /** Allows duplicate chips if set to true. */
   allowDuplicates: PropTypes.bool,
   /** If true, the placeholder will always be visible. */
