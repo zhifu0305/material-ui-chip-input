@@ -193,15 +193,10 @@ class ChipInput extends React.Component {
     if (props.defaultValue) {
       this.state.chips = props.defaultValue
     }
-    this.labelRef = React.createRef()
     this.input = React.createRef()
   }
 
   componentDidMount () {
-    if (this.props.variant === 'outlined') {
-      this.labelNode = ReactDOM.findDOMNode(this.labelRef.current)
-      this.forceUpdate()
-    }
   }
 
   componentWillUnmount () {
@@ -518,7 +513,6 @@ class ChipInput extends React.Component {
       rootRef,
       value,
       variant,
-      isFocused,
       ...other
     } = this.props
 
@@ -526,9 +520,6 @@ class ChipInput extends React.Component {
     const actualInputValue = inputValue != null ? inputValue : this.state.inputValue
 
     const hasInput = (this.props.value || actualInputValue).length > 0 || actualInputValue.length > 0
-    const shrinkFloatingLabel = InputLabelProps.shrink != null
-      ? InputLabelProps.shrink
-      : (label != null && (hasInput || isFocused || chips.length > 0))
 
     const chipComponents = chips.map((chip, i) => {
       const value = dataSourceConfig ? chip[dataSourceConfig.value] : chip
@@ -550,10 +541,7 @@ class ChipInput extends React.Component {
 
     const InputMore = {}
     if (variant === 'outlined') {
-      InputMore.notched = shrinkFloatingLabel
-      InputMore.labelWidth =
-        (shrinkFloatingLabel && this.labelNode && this.labelNode.offsetWidth) ||
-        0
+      InputMore.notched = true;
     }
 
     if (variant !== 'standard') {
@@ -567,45 +555,11 @@ class ChipInput extends React.Component {
     const InputComponent = variantComponent[variant]
 
     return (
-      <FormControl
-        ref={rootRef}
-        fullWidth={fullWidth}
-        className={cx(className, classes.root, {
-          [classes.marginDense]: other.margin === 'dense'
-        })}
-        error={error}
-        required={required}
-        onClick={this.focus}
-        disabled={disabled}
-        variant={variant}
-        {...other}
-      >
-        {label && (
-          <InputLabel
-            htmlFor={id}
-            classes={{ root: cx(classes[variant], classes.label), shrink: classes.labelShrink }}
-            shrink={shrinkFloatingLabel}
-            focused={isFocused}
-            variant={variant}
-            ref={this.labelRef}
-            {...InputLabelProps}
-          >
-            {label}
-          </InputLabel>
-        )}
         <div
           className={cx(
             classes[variant],
-            classes.chipContainer,
-            {
-              [classes.focused]: isFocused,
-              [classes.underline]: !disableUnderline && variant === 'standard',
-              [classes.disabled]: disabled,
-              [classes.labeled]: label != null,
-              [classes.error]: error
-            })}
+            classes.chipContainer)}
         >
-          {variant === 'standard' && chipComponents}
           <InputComponent
             ref={this.input}
             classes={{
@@ -623,27 +577,17 @@ class ChipInput extends React.Component {
             inputRef={this.setActualInputRef}
             disabled={disabled}
             fullWidth={fullWidthInput}
-            placeholder={(!hasInput && (shrinkFloatingLabel || label == null)) || alwaysShowPlaceholder ? placeholder : null}
+            placeholder={alwaysShowPlaceholder ? placeholder : null}
             readOnly={readOnly}
             {...InputProps}
             {...InputMore}
           />
         </div>
-        {helperText && (
-          <FormHelperText
-            {...FormHelperTextProps}
-            className={FormHelperTextProps ? cx(FormHelperTextProps.className, classes.helperText) : classes.helperText}
-          >
-            {helperText}
-          </FormHelperText>
-        )}
-      </FormControl>
     )
   }
 }
 
 ChipInput.propTypes = {
-  isFocused: PropTypes.bool,
   /** Allows duplicate chips if set to true. */
   allowDuplicates: PropTypes.bool,
   /** If true, the placeholder will always be visible. */
@@ -736,4 +680,4 @@ export const defaultChipRenderer = ({ value, text, isFocused, isDisabled, isRead
     onDelete={handleDelete}
     label={text}
   />
-)
+);
